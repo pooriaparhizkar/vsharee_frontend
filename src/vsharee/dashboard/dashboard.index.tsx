@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import "./dashboard.style.scss";
 import { authToken } from "../../scripts/storage";
-import { useNavigate } from "react-router-dom";
-import { API } from "../../data";
+import { Link, useNavigate } from "react-router-dom";
+import { API, RoutePaths } from "../../data";
 import { GlobalContext } from "../../context";
 import { AppContextActionKeyEnum, AuthStatus, Groups } from "../../interface";
 import { get, post, responseValidator } from "../../scripts/api";
@@ -55,6 +55,7 @@ function Dashboard() {
           <div>
             <h4>{item.name}</h4>
             <h6>{item.description}</h6>
+            <Link to={RoutePaths.group.detail(item._id)}>Enter</Link>
           </div>
         ))}
       </div>

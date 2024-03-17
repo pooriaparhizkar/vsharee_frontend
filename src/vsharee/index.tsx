@@ -8,6 +8,7 @@ import Dashboard from "./dashboard/dashboard.index";
 import Register from "./authentication/register/register.index";
 import { GlobalContext } from "../context";
 import { AppContextActionKeyEnum, AuthStatus, UserData } from "../interface";
+import Group from "./group/group.index";
 
 function Home() {
   const navigate = useNavigate();
@@ -37,6 +38,7 @@ function Home() {
     <React.StrictMode>
       {authStatus === AuthStatus.isValid ? (
         <Routes>
+          <Route path="/group/:id" element={<Group />} />
           <Route path="/" element={<Dashboard />} />
           <Route path="*" element={<Dashboard />} />
         </Routes>
