@@ -1,6 +1,6 @@
 export interface __Tokens {
     access_token: string;
-    user: { pk: string; username: string; firstname: string; lastname: string };
+    user: __UserData;
 }
 
 export interface __UserData {
