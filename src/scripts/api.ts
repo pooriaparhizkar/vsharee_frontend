@@ -87,7 +87,6 @@ export function put<R>(url: string, body: any): Promise<Response<R | null>> {
         })
             .then(function (response) {
                 status = response.status;
-                //console.log(response);
                 return response.json();
             })
             .then(function (data) {
@@ -109,7 +108,6 @@ export function patch<R>(url: string, body: any): Promise<Response<R | null>> {
         })
             .then(function (response) {
                 status = response.status;
-                //console.log(response);
                 return response.json();
             })
             .then(function (data) {

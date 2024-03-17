@@ -4,15 +4,14 @@ import { get, responseValidator } from "../scripts/api";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import Login from "./authentication/login/login.index";
 import { API, RoutePaths } from "../data";
+import Dashboard from "./dashboard/dashboard.index";
+import Register from "./authentication/register/register.index";
 
-function Dashboard() {
+function Home() {
   const navigate = useNavigate();
   useEffect(() => {
     get(API.user.user).then((e) => {
-      if (responseValidator(e.status)) {
-        console.log("done");
-      } else {
-        console.log("zzz");
+      if (!responseValidator(e.status)) {
         navigate(RoutePaths.auth.login);
       }
     });
@@ -22,10 +21,11 @@ function Dashboard() {
     <React.StrictMode>
       <Routes>
         <Route path={RoutePaths.auth.login} element={<Login />} />
-        <Route path="/" element={<h1>hello world</h1>} />
+        <Route path={RoutePaths.auth.register} element={<Register />} />
+        <Route path="/" element={<Dashboard />} />
       </Routes>
     </React.StrictMode>
   );
 }
 
-export default Dashboard;
+export default Home;

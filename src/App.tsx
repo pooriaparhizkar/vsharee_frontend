@@ -1,10 +1,10 @@
 import { BrowserRouter } from "react-router-dom";
-import Dashboard from "./vsharee";
+import Home from "./vsharee";
 
 function App() {
   return (
     <BrowserRouter>
-      <Dashboard />
+      <Home />
     </BrowserRouter>
   );
 }
