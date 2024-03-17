@@ -7,12 +7,7 @@ import { API, RoutePaths } from "../data";
 import Dashboard from "./dashboard/dashboard.index";
 import Register from "./authentication/register/register.index";
 import { GlobalContext } from "../context";
-import {
-  AppContextActionKeyEnum,
-  AuthStatus,
-  Response,
-  UserData,
-} from "../interface";
+import { AppContextActionKeyEnum, AuthStatus, UserData } from "../interface";
 
 function Home() {
   const navigate = useNavigate();

@@ -1,5 +1,7 @@
-export interface __Tokens {
-    access_token: string;
-    refresh_token: string;
-    user: { pk: string; username: string; firstname: string; lastname: string };
+import { UserData } from ".";
+
+export interface __Groups {
+    name: string;
+    description: string;
+    members: UserData[];
 }

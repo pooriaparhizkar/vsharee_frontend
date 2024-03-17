@@ -4,7 +4,6 @@ import { post, responseValidator } from "../../../scripts/api";
 import { API, RoutePaths } from "../../../data";
 import {
   Tokens,
-  Response,
   AppContextActionKeyEnum,
   AuthStatus,
 } from "../../../interface";

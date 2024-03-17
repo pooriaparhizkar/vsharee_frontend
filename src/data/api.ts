@@ -5,5 +5,8 @@ export const API = {
     },
     user: {
         user: "/user/user",
+    },
+    groups: {
+        index: "/group/",
     }
 }
