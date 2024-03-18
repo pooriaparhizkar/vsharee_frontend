@@ -4,6 +4,7 @@ export interface __Tokens {
 }
 
 export interface __UserData {
+    _id: string;
     bio: string;
     email: string;
     firstname: string;

@@ -1,12 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { authToken } from "../../scripts/storage";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { RoutePaths } from "../../data";
+import { UserData } from "../../interface";
+import { GlobalContext } from "../../context";
 
 function Group() {
   const [ws, setWs] = useState<any>(null);
   const [newMessage, setNewMessage] = useState<string>();
   const [messagesToShow, setMessagesToShow] = useState<string[]>([]);
+  const { userData } = useContext(GlobalContext);
+  const [onlineMembers, setOnlineMembers] = useState<UserData[]>([]);
   const { id } = useParams();
+  const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
 
   // Send a heartbeat message every 30 seconds
   useEffect(() => {
@@ -27,9 +33,38 @@ function Group() {
     };
 
     newWs.onmessage = function (event) {
-      const content = JSON.parse(event.data);
-      if (content.type === "heartbeat") return;
-      setMessagesToShow((prevMessages) => [...prevMessages, event.data]);
+      const wsData = JSON.parse(event.data);
+      const sender = wsData.sender;
+      let data = wsData.data;
+      data = typeof data === "string" ? JSON.parse(data) : data;
+      const type = data?.type;
+      const content = data?.content;
+      switch (type) {
+        case "heartbeat":
+          return;
+        case "chat":
+          setMessagesToShow((prevMessages) => [
+            ...prevMessages,
+            sender.username + ": " + content,
+          ]);
+          break;
+        case "prev-online":
+          setOnlineMembers(content);
+          break;
+        case "online":
+          setOnlineMembers((prevMembers) => {
+            if (!prevMembers.find((member) => member._id === content._id))
+              return [...prevMembers, content];
+            return prevMembers;
+          });
+          break;
+        case "offline":
+          setOnlineMembers((prevMembers) =>
+            prevMembers.filter((member) => member._id !== content._id)
+          );
+
+          break;
+      }
     };
 
     // Clean up function to close WebSocket connection when component unmounts
@@ -42,8 +77,7 @@ function Group() {
     // Check if WebSocket instance exists before sending message
     if (ws) {
       if (newMessage && newMessage !== "") {
-        setMessagesToShow([...messagesToShow, newMessage]);
-        ws.send(newMessage);
+        ws.send(JSON.stringify({ type: "chat", content: newMessage }));
         setNewMessage("");
       }
     } else {
@@ -51,8 +85,23 @@ function Group() {
     }
   };
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files && event.target.files[0];
+    if (file) {
+      setSelectedVideo(file);
+    }
+  };
+
   return (
     <div>
+      <Link to={RoutePaths.dashboard}>Dashboard</Link>
+      <div>
+        <button onClick={() => console.log(onlineMembers)}>online</button>
+        <h4>Online Members</h4>
+        {onlineMembers.map((member, index) => (
+          <p key={index}>{member.username}</p>
+        ))}
+      </div>
       <input
         placeholder="send a message"
         onChange={(e) => setNewMessage(e.target.value)}
@@ -62,6 +111,13 @@ function Group() {
       {messagesToShow.map((item, index) => (
         <p key={index}>{item}</p>
       ))}
+      <input type="file" accept="video/*" onChange={handleFileChange} />
+      {selectedVideo && (
+        <video style={{ width: "100%", height: 300 }} controls>
+          <source src={URL.createObjectURL(selectedVideo)} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      )}
     </div>
   );
 }
