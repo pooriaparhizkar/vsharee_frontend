@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from "react";
+import { authToken } from "../../scripts/storage";
+import { useParams } from "react-router-dom";
 
 function Group() {
   const [ws, setWs] = useState<any>(null);
   const [newMessage, setNewMessage] = useState<string>();
   const [messagesToShow, setMessagesToShow] = useState<string[]>([]);
+  const { id } = useParams();
 
   useEffect(() => {
     // Create WebSocket connection when component mounts
-    const newWs = new WebSocket("ws://localhost:8000");
+    const newWs = new WebSocket(
+      `ws://localhost:8000?token=${authToken.get()?.access_token}&groupId=${id}`
+    );
 
     // Set WebSocket instance to state
     setWs(newWs);
