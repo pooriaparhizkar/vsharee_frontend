@@ -8,6 +8,7 @@ function Group() {
   const [messagesToShow, setMessagesToShow] = useState<string[]>([]);
   const { id } = useParams();
 
+  // Send a heartbeat message every 30 seconds
   useEffect(() => {
     // Create WebSocket connection when component mounts
     const newWs = new WebSocket(
@@ -20,9 +21,14 @@ function Group() {
     // Add event listeners
     newWs.onopen = function () {
       console.log("Connected to WebSocket server");
+      setInterval(() => {
+        newWs.send(JSON.stringify({ type: "heartbeat" }));
+      }, 30000);
     };
 
     newWs.onmessage = function (event) {
+      const content = JSON.parse(event.data);
+      if (content.type === "heartbeat") return;
       setMessagesToShow((prevMessages) => [...prevMessages, event.data]);
     };
 
