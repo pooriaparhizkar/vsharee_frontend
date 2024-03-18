@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { authToken } from "../../scripts/storage";
 import { Link, useParams } from "react-router-dom";
 import { RoutePaths } from "../../data";
@@ -13,6 +13,7 @@ function Group() {
   const [onlineMembers, setOnlineMembers] = useState<UserData[]>([]);
   const { id } = useParams();
   const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   // Send a heartbeat message every 30 seconds
   useEffect(() => {
@@ -39,6 +40,7 @@ function Group() {
       data = typeof data === "string" ? JSON.parse(data) : data;
       const type = data?.type;
       const content = data?.content;
+      console.log(data, type, content);
       switch (type) {
         case "heartbeat":
           return;
@@ -62,7 +64,12 @@ function Group() {
           setOnlineMembers((prevMembers) =>
             prevMembers.filter((member) => member._id !== content._id)
           );
-
+          break;
+        case "movie":
+          if (videoRef.current) {
+            if (content === "play") videoRef.current.play();
+            else if (content === "pause") videoRef.current.pause();
+          }
           break;
       }
     };
@@ -92,11 +99,32 @@ function Group() {
     }
   };
 
+  const playVideo = () => {
+    if (ws) {
+      if (videoRef.current) {
+        ws.send(JSON.stringify({ type: "movie", content: "play" }));
+        videoRef.current.play();
+      }
+    } else {
+      console.error("WebSocket connection not established.");
+    }
+  };
+
+  const stopVideo = () => {
+    if (ws) {
+      if (videoRef.current) {
+        ws.send(JSON.stringify({ type: "movie", content: "pause" }));
+        videoRef.current.pause();
+      }
+    } else {
+      console.error("WebSocket connection not established.");
+    }
+  };
+
   return (
     <div>
       <Link to={RoutePaths.dashboard}>Dashboard</Link>
       <div>
-        <button onClick={() => console.log(onlineMembers)}>online</button>
         <h4>Online Members</h4>
         {onlineMembers.map((member, index) => (
           <p key={index}>{member.username}</p>
@@ -113,10 +141,16 @@ function Group() {
       ))}
       <input type="file" accept="video/*" onChange={handleFileChange} />
       {selectedVideo && (
-        <video style={{ width: "100%", height: 300 }} controls>
-          <source src={URL.createObjectURL(selectedVideo)} type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
+        <>
+          <video style={{ width: "100%", height: 200 }} ref={videoRef} controls>
+            <source src={URL.createObjectURL(selectedVideo)} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+          <div>
+            <button onClick={playVideo}>Play</button>
+            <button onClick={stopVideo}>Stop</button>
+          </div>
+        </>
       )}
     </div>
   );
